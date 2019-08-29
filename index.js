@@ -4,17 +4,13 @@ const fs = require('fs')
 const path = require('path')
 const rimraf = require('rimraf')
 
-let db
-try {
-  db = require('./db.json')
-} catch (e) {
-  db = { lastId: -1 }
-}
-
 const OPENSEA_API = process.env.OPENSEA_API
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS
 const TWEET_DELAY = process.env.TWEET_DELAY
 const POLL_INTERVAL = process.env.POLL_INTERVAL
+
+console.log('OPENSEA_API', OPENSEA_API)
+console.log('CONTRACT_ADDRESS', CONTRACT_ADDRESS)
 
 const Twitter = require('twitter')
 
@@ -33,6 +29,14 @@ if (!fs.existsSync(path.resolve(__dirname, './images'))) {
 async function poll() {
   console.log('Polling...')
   try {
+    let db
+    try {
+      db = require('./db.json')
+    } catch (e) {
+      db = { lastId: -1 }
+    }
+
+    console.log(`Last ID: ${db.lastId}`)
     const json = await fetch(
       `${OPENSEA_API}/api/v1/assets?asset_contract_address=${CONTRACT_ADDRESS}`
     )
