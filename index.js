@@ -2,6 +2,7 @@ require('dotenv').config()
 const fetch = require('isomorphic-fetch')
 const fs = require('fs')
 const path = require('path')
+const rimraf = require('rimraf')
 
 let db
 try {
@@ -67,7 +68,12 @@ async function poll() {
 
           const tweet = await client.post('statuses/update', status)
           console.log(tweet.id)
+
+          // update counter
           fs.writeFileSync('./db.json', JSON.stringify({ lastId: id }, null, 2))
+
+          // remove image from disk
+          rimraf.sync(imagePath)
 
           await new Promise(resolve => setTimeout(resolve, TWEET_DELAY))
         }
