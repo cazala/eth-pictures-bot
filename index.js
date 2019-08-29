@@ -74,7 +74,8 @@ async function poll() {
           console.log(tweet.id)
 
           // update counter
-          fs.writeFileSync('./db.json', JSON.stringify({ lastId: id }, null, 2))
+          db.lastId = id
+          fs.writeFileSync('./db.json', JSON.stringify(db, null, 2))
 
           // remove image from disk
           rimraf.sync(imagePath)
