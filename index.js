@@ -49,37 +49,42 @@ async function poll() {
         const id = +asset.token_id
         if (id > db.lastId) {
           console.log(`New picture #${id}`)
+          console.log(`Fetching ${asset.image_url}`)
           const image = await fetch(asset.image_url)
           const imagePath = path.resolve(__dirname, `./images/${id}.png`)
-          if (!fs.existsSync(imagePath)) {
-            await new Promise((resolve, reject) =>
-              image.body
-                .pipe(fs.createWriteStream(imagePath))
-                .on('close', () => resolve())
-                .on('error', e => reject(e.message))
-            )
-          }
-
+          console.log(`Downloading...`)
+          await new Promise((resolve, reject) =>
+            image.body
+              .pipe(fs.createWriteStream(imagePath))
+              .on('close', () => resolve())
+              .on('error', e => reject(e.message))
+          )
+          console.log(`Reading ${imagePath}`)
           const data = fs.readFileSync(imagePath)
 
           // Make post request on media endpoint. Pass file data as media parameter
+          console.log(`Posting media: ${data.length} bytes`)
           const media = await client.post('media/upload', { media: data })
 
           const status = {
             status: `#${id} | https://eth.pictures | #NFT`,
             media_ids: media.media_id_string // Pass the media id string
           }
+          console.log(`Posting tweet for media id: ${media.media_id_string}`)
 
           const tweet = await client.post('statuses/update', status)
-          console.log(tweet.id)
+          console.log(`Success! Tweet id: ${tweet.id}`)
 
           // update counter
           db.lastId = id
+          console.log(`Updating counter: ${db.lastId}`)
           fs.writeFileSync('./db.json', JSON.stringify(db, null, 2))
 
           // remove image from disk
+          console.log(`Removing ${imagePath}`)
           rimraf.sync(imagePath)
 
+          console.log(`Waiting ${TWEET_DELAY} ms`)
           await new Promise(resolve => setTimeout(resolve, TWEET_DELAY))
         }
       } catch (e) {
