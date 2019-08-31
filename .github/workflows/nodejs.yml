@@ -1,12 +1,12 @@
 name: Node CI
 
 on: 
-  - push:
-      branches:
-        - master
-  - schedule:
-      # https://help.github.com/en/articles/events-that-trigger-workflows#scheduled-events
-      - cron: "*/15 * * * *"
+  push:
+    branches:
+      - master
+  schedule:
+    # https://help.github.com/en/articles/events-that-trigger-workflows#scheduled-events
+    - cron: "*/15 * * * *"
 
 jobs:
   build:
