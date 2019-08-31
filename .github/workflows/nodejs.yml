@@ -1,0 +1,31 @@
+name: Node CI
+
+on: 
+  push:
+    branches:
+      - master
+  schedule:
+    # https://help.github.com/en/articles/events-that-trigger-workflows#scheduled-events
+    - cron: "*/15 * * * *"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-node@v1
+    - name: npm install, build, and test
+      run: |
+        npm install
+        npm start
+      env:
+        CONSUMER_KEY:  ${{ secrets.CONSUMER_KEY }}
+        CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+        ACCESS_TOKEN_KEY: ${{ secrets.ACCESS_TOKEN_KEY }}
+        ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+        OPENSEA_API: "https://api.opensea.io"
+        CONTRACT_ADDRESS: "0x74F1241Adda635f3F2e214543A39beE0bB7c0FeF"
+        TWEET_DELAY: 10000
+        POLL_INTERVAL: 60000
